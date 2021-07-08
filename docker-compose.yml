@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  mongo-database:
+    build: la-imagen-de-la-bd-va-aqui:con-su-tag
+    container_name: mongo-database
+    volumes:
+      - type: volume
+        source: storage
+        target: /data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: supersecurepassword
+      MONGO_INITDB_DATABASE: mongo
+    ports:
+      - 27017-27019:27017-27019
+
+  spring-backend:
+    build: la-imagen-del-back-end-va-aqui:con-su-tag
+    container_name: spring-backend
+    environment:
+      DATABASE_URL: mongodb://user:supersecurepassword@mongodb-database:27017/mongo
+      VARIABLE_ENTORNO: hahabusiness
+    ports:
+      - 8080:8080
+    links:
+      - mongodb-database
+
+  frontend:
+    build: la-imagen-del-front-end-va-aqui:con-su-tag
+    container_name: frontend
+    ports:
+      - 80:80
+    links:
+      - spring-backend
+
+# Aquí implicitamente se declara el volumen de storage que la base de datos usa
+volumes:
+  storage:
